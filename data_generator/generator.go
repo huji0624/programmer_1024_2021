@@ -12,7 +12,7 @@ import (
 )
 
 const TotalFileCount = 100
-const DataCountEachFile = 10000*10
+const DataCountEachFile = 10000*1
 const ConcurrentCount = 10
 const MagicRatio = 10000
 
@@ -52,8 +52,8 @@ func main() {
 func generateID() string{
 
 	from := "0123456789abcdefghijklmnopqrsduvwxyz"
-	var s [50]byte
-	for i:=0;i<50;i++{
+	var s [64]byte
+	for i:=0;i<64;i++{
 		s[i]=from[rand.Intn(36)]
 	}
 
@@ -76,8 +76,7 @@ func randomCal(bi *big.Int,n *big.Int) *big.Int{
 		magic = bi.Mul(bi,n)
 		break
 	case 3:
-		bi = bi.Sub(bi,n)
-		magic = bi.Div(bi,big.NewInt(rand.Int63n(30)+1))
+		magic = bi.Mod(bi,n)
 		break
 	}
 
