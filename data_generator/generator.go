@@ -14,7 +14,7 @@ import (
 
 const TotalFileCount = 10
 const DataCountEachFile = 10000 * 30
-const ConcurrentCount = 1
+const ConcurrentCount = 10
 const MagicRatio = 10000
 const OutputDir = "data"
 
@@ -33,7 +33,7 @@ func createEnv() {
 func main() {
 	createEnv()
 	rand.Seed(time.Now().UnixNano())
-
+	begin := time.Now()
 	ch := make(chan int, ConcurrentCount)
 	done := make(chan int, TotalFileCount)
 	for i := 0; i < TotalFileCount; i++ {
@@ -57,11 +57,14 @@ func main() {
 		return
 	}
 
+	println("")
 	println("Total magics : ", len(magicids))
 	ioutil.WriteFile("magic_ids.json", []byte(bs), 0644)
+
+	println("whole duration:", time.Since(begin).String())
 }
 
-func generateID() string {
+func generateID(rand *rand.Rand) string {
 
 	from := "0123456789abcdefghijklmnopqrsduvwxyz"
 	var s [64]byte
@@ -108,7 +111,7 @@ func generateNumber() string {
 	return sb.String()
 }
 
-func generateMagicNumber(bi *big.Int) (bool, string) {
+func generateMagicNumber(bi *big.Int, rand *rand.Rand) (bool, string) {
 
 	n := big.NewInt(1024)
 	ifmagic := rand.Intn(MagicRatio) == 0
@@ -179,13 +182,14 @@ func checkIFMagic(id *big.Int, mg string) bool {
 func generateOneFile(c chan int, done chan int) {
 
 	magicCount := 0
+	source := rand.NewSource(time.Now().UnixNano())
+	generator := rand.New(source)
 
-	//println(time.Now().String()," generate data...")
 	var b strings.Builder
 	for i := 0; i < DataCountEachFile; i++ {
-		id := generateID()
+		id := generateID(generator)
 		numInID := stripInt(id)
-		ifmagic, mg := generateMagicNumber(copyBig(numInID))
+		ifmagic, mg := generateMagicNumber(copyBig(numInID), generator)
 		if ifmagic {
 			magicidsLock.Lock()
 			magicids = append(magicids, id)
@@ -193,7 +197,7 @@ func generateOneFile(c chan int, done chan int) {
 			magicCount++
 		} else {
 			if checkIFMagic(numInID, mg) {
-				println(i, " - wrong magic number:", id, " ", numInID.String(), " ", mg)
+				//println(i, " - wrong magic number:", id, " ", numInID.String(), " ", mg)
 				continue
 			}
 		}
