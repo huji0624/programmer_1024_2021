@@ -32,7 +32,7 @@ func createEnv() {
 }
 func main() {
 	createEnv()
-	rand.Seed(time.Now().UnixNano())
+
 	begin := time.Now()
 	ch := make(chan int, ConcurrentCount)
 	done := make(chan int, TotalFileCount)
