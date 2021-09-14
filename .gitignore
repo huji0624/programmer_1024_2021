@@ -1,2 +1,3 @@
 data_generator/data
-data_generator/magic_ids.json
+/data
+magic_ids.json
