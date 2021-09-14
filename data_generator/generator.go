@@ -95,30 +95,30 @@ func randomCal(bi *big.Int, n *big.Int) *big.Int {
 	return magic
 }
 
-func generateNumber() string{
+func generateNumber() string {
 
-	numlen := rand.Intn(18)+2
+	numlen := rand.Intn(18) + 2
 
 	sb := strings.Builder{}
 	from := "0123456789"
-	for i:=0;i<numlen;i++{
+	for i := 0; i < numlen; i++ {
 		sb.WriteByte(from[rand.Intn(10)])
 	}
 
 	return sb.String()
 }
 
-func generateMagicNumber(bi *big.Int) (bool,string) {
+func generateMagicNumber(bi *big.Int) (bool, string) {
 
 	n := big.NewInt(1024)
 	ifmagic := rand.Intn(MagicRatio) == 0
 
 	magic := randomCal(bi, n)
 
-	if ifmagic{
-		return true,magic.String()
-	}else{
-		return false,generateNumber()
+	if ifmagic {
+		return true, magic.String()
+	} else {
+		return false, generateNumber()
 	}
 }
 
@@ -137,43 +137,46 @@ func stripInt(id string) *big.Int {
 	return n
 }
 
-func copyBig(id *big.Int) *big.Int{
+func copyBig(id *big.Int) *big.Int {
 	cal := big.NewInt(0)
 	cal = cal.Set(id)
 	return cal
 }
 
-func checkIFMagic(id *big.Int,mg string) bool {
+func checkIFMagic(id *big.Int, mg string) bool {
 
+	mgValue, success := big.NewInt(0).SetString(mg, 10)
+	if !success {
+		panic("failed decode mg")
+	}
 	num1024 := big.NewInt(1024)
 	cal := copyBig(id)
-	result := cal.Add(cal,num1024)
-	if result.String()==mg{
+	result := cal.Add(cal, num1024)
+	if result.Cmp(mgValue) == 0 {
+		return true
+	}
+	cal = copyBig(id)
+	result = cal.Sub(cal, num1024)
+	if result.Cmp(mgValue) == 0 {
 		return true
 	}
 
 	cal = copyBig(id)
-	result = cal.Sub(cal,num1024)
-	if result.String()==mg{
+	result = cal.Mul(cal, num1024)
+	if result.Cmp(mgValue) == 0 {
 		return true
 	}
 
 	cal = copyBig(id)
-	result = cal.Mul(cal,num1024)
-	if result.String()==mg{
-		return true
-	}
-
-	cal = copyBig(id)
-	result = cal.Mod(cal,num1024)
-	if result.String()==mg{
+	result = cal.Mod(cal, num1024)
+	if result.Cmp(mgValue) == 0 {
 		return true
 	}
 
 	return false
 }
 
-func generateOneFile(c chan int,done chan int){
+func generateOneFile(c chan int, done chan int) {
 
 	magicCount := 0
 
@@ -182,15 +185,15 @@ func generateOneFile(c chan int,done chan int){
 	for i := 0; i < DataCountEachFile; i++ {
 		id := generateID()
 		numInID := stripInt(id)
-		ifmagic,mg := generateMagicNumber(copyBig(numInID))
-		if ifmagic{
+		ifmagic, mg := generateMagicNumber(copyBig(numInID))
+		if ifmagic {
 			magicidsLock.Lock()
 			magicids = append(magicids, id)
 			magicidsLock.Unlock()
 			magicCount++
-		}else{
-			if checkIFMagic(numInID,mg){
-				println(i," - wrong magic number:",id," ",numInID.String()," ",mg)
+		} else {
+			if checkIFMagic(numInID, mg) {
+				println(i, " - wrong magic number:", id, " ", numInID.String(), " ", mg)
 				continue
 			}
 		}
