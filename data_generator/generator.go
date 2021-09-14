@@ -98,7 +98,7 @@ func randomCal(bi *big.Int, n *big.Int) *big.Int {
 	return magic
 }
 
-func generateNumber() string {
+func generateNumber(rand *rand.Rand) string {
 
 	numlen := rand.Intn(18) + 2
 
@@ -121,7 +121,7 @@ func generateMagicNumber(bi *big.Int, rand *rand.Rand) (bool, string) {
 	if ifmagic {
 		return true, magic.String()
 	} else {
-		return false, generateNumber()
+		return false, generateNumber(rand)
 	}
 }
 
