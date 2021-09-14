@@ -12,9 +12,9 @@ import (
 	"time"
 )
 
-const TotalFileCount = 100
-const DataCountEachFile = 10000 * 1
-const ConcurrentCount = 10
+const TotalFileCount = 10
+const DataCountEachFile = 10000 * 30
+const ConcurrentCount = 1
 const MagicRatio = 10000
 const OutputDir = "data"
 
@@ -99,14 +99,13 @@ func generateNumber() string{
 
 	numlen := rand.Intn(18)+2
 
+	sb := strings.Builder{}
 	from := "0123456789"
-	var s [30]byte
 	for i:=0;i<numlen;i++{
-		s[i]=from[rand.Intn(10)]
-		s[i+1] = 0
+		sb.WriteByte(from[rand.Intn(10)])
 	}
 
-	return string(s[:])
+	return sb.String()
 }
 
 func generateMagicNumber(bi *big.Int) (bool,string) {
