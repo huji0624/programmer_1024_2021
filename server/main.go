@@ -43,7 +43,7 @@ func main() {
 
 	//跨域问题
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000", "http://192.168.1.66:9091"}
+	config.AllowOrigins = []string{"http://localhost:8080", "http://192.168.1.66:9091"}
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
 
@@ -78,8 +78,8 @@ func ReturnData(c *gin.Context,errorno int, data interface{}) {
 }
 
 type DigData struct {
-	Token string
-	Locationid string
+	Token string `json:"token"`
+	Locationid string `json:"locationid"`
 }
 
 func Dig(c *gin.Context) {
@@ -123,16 +123,26 @@ func Dig(c *gin.Context) {
 	}
 }
 
-func Info(c *gin.Context) {
-	var result = make(map[string]string)
+type InfoData struct {
+	Total int `json:"total"`
+	Result map[string]int `json:"result"`
+}
 
-	for k,v := range magic_id_scores{
+func Info(c *gin.Context) {
+	var data InfoData
+
+	var result = make(map[string]int)
+
+	for _,v := range magic_id_scores{
 		if v!=""{
-			result[k] = v
+			result[v] = result[v] + 1
 		}
 	}
 
-	ReturnData(c,0,result)
+	data.Result = result
+	data.Total = len(magic_id_scores)
+
+	ReturnData(c,0,data)
 }
 
 

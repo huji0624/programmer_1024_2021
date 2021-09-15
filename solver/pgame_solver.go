@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math/big"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -59,7 +62,17 @@ func workOnLine(line string) {
 	bi := stripInt(item.Locationid)
 	if checkIFMagic(bi, item.Magic) {
 		//println("Magic:",item.Locationid)
-		magics = append(magics, item.Locationid)
+		//magics = append(magics, item.Locationid)
+
+		data := make(map[string]interface{})
+		data["locationid"] = item.Locationid
+		data["token"] = "test1"
+		
+		bytesData, _ := json.Marshal(data)
+		resp, _ := http.Post("http://localhost/dig","application/json", bytes.NewReader(bytesData))
+		defer resp.Body.Close()
+		body, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(body))
 	}
 }
 
