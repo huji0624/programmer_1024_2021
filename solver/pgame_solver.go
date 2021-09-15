@@ -67,7 +67,7 @@ func workOnLine(line string) {
 		data := make(map[string]interface{})
 		data["locationid"] = item.Locationid
 		data["token"] = "test1"
-		
+
 		bytesData, _ := json.Marshal(data)
 		resp, _ := http.Post("http://localhost/dig","application/json", bytes.NewReader(bytesData))
 		defer resp.Body.Close()

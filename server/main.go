@@ -48,6 +48,7 @@ func main() {
 	router.Use(cors.New(config))
 
 	router.Static("/files", "./files")
+	router.Static("/h5", "../h5/dist")
 
 	router.POST("",nil)
 	router.GET("",nil)
