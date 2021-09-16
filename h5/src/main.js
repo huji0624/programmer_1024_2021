@@ -11,7 +11,7 @@ console.log(process.env.NODE_ENV)
 if(process.env.NODE_ENV==="development"){
   axios.defaults.baseURL = 'http://localhost';
 }else{
-  axios.defaults.baseURL = 'http://:8080';
+  axios.defaults.baseURL = 'http://47.104.220.230';
 }
 axios.defaults.withCredentials = true; // 允许携带cookie
 

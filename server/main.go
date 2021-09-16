@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
@@ -18,6 +19,9 @@ var teams = make(map[string]string)
 var diglock sync.Mutex
 
 func main() {
+
+	pid := os.Getpid()
+	ioutil.WriteFile("./pid",[]byte(fmt.Sprintf("%d",pid)),0644)
 
 	data,err := ioutil.ReadFile("../data_generator/magic_ids.json")
 	if err!=nil{
@@ -38,7 +42,7 @@ func main() {
 	teams["test1"] = "test1"
 	teams["test2"] = "test2"
 
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default() //返回默认引擎，里面有系统定义的中间件
 
 	//跨域问题
@@ -49,9 +53,6 @@ func main() {
 
 	router.Static("/files", "./files")
 	router.Static("/h5", "../h5/dist")
-
-	router.POST("",nil)
-	router.GET("",nil)
 
 	router.POST("/dig",Dig)
 	router.GET("/info",Info)

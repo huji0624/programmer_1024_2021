@@ -3,4 +3,5 @@ data_generator/data
 magic_ids.json
 .idea/
 server/files
+server/pid
 h5/node_modules

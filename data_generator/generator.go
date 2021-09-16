@@ -14,9 +14,9 @@ import (
 	"time"
 )
 
-const TotalFileCount = 5
-const DataCountEachFile = 10000 * 30
-const ConcurrentCount = 8
+var TotalFileCount int
+var DataCountEachFile int
+const ConcurrentCount = 10
 const MagicRatio = 50000
 const OutputDir = "data"
 
@@ -35,7 +35,11 @@ func createEnv() {
 func main() {
 	var randomSourceSeed int64
 	flag.Int64Var(&randomSourceSeed,"s",0,"random source seed.")
+	flag.IntVar(&TotalFileCount,"c",5,"total file count.")
+	flag.IntVar(&DataCountEachFile,"d",10,"data count each file.unit 10000.")
 	flag.Parse()
+
+	DataCountEachFile = DataCountEachFile * 10000
 
 	log.Println("Seed : ",randomSourceSeed)
 
