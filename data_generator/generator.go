@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/big"
 	"math/rand"
 	"os"
@@ -12,10 +14,10 @@ import (
 	"time"
 )
 
-const TotalFileCount = 10
+const TotalFileCount = 5
 const DataCountEachFile = 10000 * 30
-const ConcurrentCount = 10
-const MagicRatio = 10000
+const ConcurrentCount = 8
+const MagicRatio = 50000
 const OutputDir = "data"
 
 var magicids []string = make([]string, 0, 1000)
@@ -31,6 +33,12 @@ func createEnv() {
 	}
 }
 func main() {
+	var randomSourceSeed int64
+	flag.Int64Var(&randomSourceSeed,"s",0,"random source seed.")
+	flag.Parse()
+
+	log.Println("Seed : ",randomSourceSeed)
+
 	createEnv()
 
 	begin := time.Now()
@@ -38,7 +46,7 @@ func main() {
 	done := make(chan int, TotalFileCount)
 	for i := 0; i < TotalFileCount; i++ {
 		ch <- i
-		go generateOneFile(ch, done)
+		go generateOneFile(ch, done,randomSourceSeed+int64(i),randomSourceSeed==0)
 	}
 
 	count := 0
@@ -75,7 +83,7 @@ func generateID(rand *rand.Rand) string {
 	return string(s[:])
 }
 
-func randomCal(bi *big.Int, n *big.Int) *big.Int {
+func randomCal(bi *big.Int, n *big.Int, rand *rand.Rand) *big.Int {
 
 	var magic *big.Int
 
@@ -116,7 +124,7 @@ func generateMagicNumber(bi *big.Int, rand *rand.Rand) (bool, string) {
 	n := big.NewInt(1024)
 	ifmagic := rand.Intn(MagicRatio) == 0
 
-	magic := randomCal(bi, n)
+	magic := randomCal(bi, n, rand)
 
 	if ifmagic {
 		return true, magic.String()
@@ -179,10 +187,15 @@ func checkIFMagic(id *big.Int, mg string) bool {
 	return false
 }
 
-func generateOneFile(c chan int, done chan int) {
+func generateOneFile(c chan int, done chan int,randSourceSeed int64,timesource bool) {
 
 	magicCount := 0
-	source := rand.NewSource(time.Now().UnixNano())
+	var source rand.Source
+	if timesource{
+		source = rand.NewSource(time.Now().UnixNano())
+	}else{
+		source = rand.NewSource(randSourceSeed)
+	}
 	generator := rand.New(source)
 
 	var b strings.Builder
