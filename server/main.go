@@ -23,20 +23,7 @@ func main() {
 	pid := os.Getpid()
 	ioutil.WriteFile("./pid",[]byte(fmt.Sprintf("%d",pid)),0644)
 
-	data,err := ioutil.ReadFile("../data_generator/magic_ids.json")
-	if err!=nil{
-		log.Println(err.Error())
-		os.Exit(-1)
-	}
-
-	err = json.Unmarshal(data,&magic_ids)
-	if err!=nil{
-		log.Println(err.Error())
-		os.Exit(-1)
-	}
-	for _,v := range magic_ids{
-		magic_id_scores[v] = ""
-	}
+	loadMagicIDS()
 
 	//token => teamname map
 	teams["test1"] = "test1"
@@ -55,10 +42,28 @@ func main() {
 	router.Static("/h5", "../h5/dist")
 
 	router.POST("/dig",Dig)
+	router.GET("/reset",Reset)
 	router.GET("/info",Info)
 
 	router.Run(":80")
 
+}
+
+func loadMagicIDS(){
+	data,err := ioutil.ReadFile("../data_generator/magic_ids.json")
+	if err!=nil{
+		log.Println(err.Error())
+		os.Exit(-1)
+	}
+
+	err = json.Unmarshal(data,&magic_ids)
+	if err!=nil{
+		log.Println(err.Error())
+		os.Exit(-1)
+	}
+	for _,v := range magic_ids{
+		magic_id_scores[v] = ""
+	}
 }
 
 func ReturnError(c *gin.Context, apierr error) {
@@ -77,6 +82,26 @@ func ReturnData(c *gin.Context,errorno int, data interface{}) {
 		"data":   data,
 		"errorno": errorno,
 	})
+}
+
+type ResetData struct {
+	Code string `form:"code"`
+}
+
+func Reset(c *gin.Context) {
+	var params ResetData
+
+	c.ShouldBindQuery(&params)
+	log.Println(params)
+
+	if params.Code!="pg"{
+		ReturnError(c,errors.New("server error."))
+		return
+	}
+
+	loadMagicIDS()
+
+	ReturnData(c,0,nil)
 }
 
 type DigData struct {

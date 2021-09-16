@@ -1,7 +1,8 @@
 <template>
   <el-container>
-    <!-- <el-aside width="200px">
-    </el-aside> -->
+    <el-aside width="200px">
+
+    </el-aside>
     <el-main style="">
     
 
@@ -24,6 +25,10 @@
     </el-table>
       
     </el-main>
+    <el-aside width="200px">
+        <el-input size="mini" v-model="input" placeholder="密令"></el-input>
+        <el-button size="mini" @click="reset" type="warning" style="margin-top:20px;">重置</el-button>
+    </el-aside>
   </el-container>
 </template>
 
@@ -37,7 +42,8 @@ export default {
   data:function(){
     return {
       tableData:[],
-      progress:0
+      progress:0,
+      input:""
     }
   },
   created:function(){
@@ -50,6 +56,18 @@ export default {
   methods:{
     hcs:function(){
       return "text-align : center;"
+    },
+    reset:function(){
+      let out_this = this;
+      common.get("reset",{code:this.input},function(res){
+        console.log(res)
+        if(res.data.errorno==0){
+          out_this.$message.success("重置成功")
+        }
+
+      },function(err){
+        console.log(err)
+      })
     },
     getList:function(){
       let out_this = this;
