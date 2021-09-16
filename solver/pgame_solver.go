@@ -15,34 +15,43 @@ import (
 var magics []string
 
 func main() {
+	//cpuNum := runtime.NumCPU()
+
 	begin := time.Now()
 	dirPath := "../data_generator/data"
 	flist, _ := ioutil.ReadDir(dirPath)
 
-	readTime := 0.0
-	calTime := 0.0
+	ch := make(chan string)
 
 	for _, f := range flist {
 		fPath := dirPath + "/" + f.Name()
-
-		beforeRead := time.Now()
-		fContent, _ := ioutil.ReadFile(fPath)
-		readTime += time.Since(beforeRead).Seconds()
-
-		beforeCal := time.Now()
-		text := string(fContent)
-		lines := strings.Split(text, "\n")
-		for _, v := range lines {
-			if v != "" {
-				workOnLine(v)
-			}
-		}
-		calTime += time.Since(beforeCal).Seconds()
+		go workOnFile(fPath,ch)
 	}
 
-	println("read duration:", readTime)
-	println("cal duration:", calTime)
+	count := 0
+	for true {
+		<-ch
+		count++
+		if count==len(flist){
+			break
+		}
+	}
+
 	println("whole duration:", time.Since(begin).String())
+}
+
+func workOnFile(fPath string,ch chan string){
+	fContent, _ := ioutil.ReadFile(fPath)
+
+	text := string(fContent)
+	lines := strings.Split(text, "\n")
+	for _, v := range lines {
+		if v != "" {
+			workOnLine(v)
+		}
+	}
+
+	ch <- fPath
 }
 
 type Line struct {
@@ -64,12 +73,13 @@ func workOnLine(line string) {
 		//println("Magic:",item.Locationid)
 		//magics = append(magics, item.Locationid)
 
+		//return
 		data := make(map[string]interface{})
 		data["locationid"] = item.Locationid
 		data["token"] = "test1"
 
 		bytesData, _ := json.Marshal(data)
-		resp, _ := http.Post("http://localhost/dig","application/json", bytes.NewReader(bytesData))
+		resp, _ := http.Post("http://47.104.220.230/dig","application/json", bytes.NewReader(bytesData))
 		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
 		fmt.Println(string(body))
