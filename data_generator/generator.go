@@ -112,7 +112,7 @@ func randomCal(bi *big.Int, n *big.Int, rand *rand.Rand) *big.Int {
 
 func generateNumber(rand *rand.Rand) string {
 
-	numlen := rand.Intn(18) + 2
+	numlen := rand.Intn(31) + 2
 
 	sb := strings.Builder{}
 	from := "0123456789"

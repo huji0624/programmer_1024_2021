@@ -76,12 +76,17 @@ func ReturnError(c *gin.Context, apierr error) {
 }
 
 func ReturnData(c *gin.Context,errorno int, data interface{}) {
-	log.Println("return data:", data)
-
-	c.JSON(http.StatusOK, gin.H{
-		"data":   data,
-		"errorno": errorno,
-	})
+	if data==nil{
+		c.JSON(http.StatusOK, gin.H{
+			"errorno": errorno,
+		})
+	}else{
+		log.Println("return data:", data)
+		c.JSON(http.StatusOK, gin.H{
+			"data":   data,
+			"errorno": errorno,
+		})
+	}
 }
 
 type ResetData struct {

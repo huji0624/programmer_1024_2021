@@ -1,4 +1,5 @@
 data_generator/data
+docs
 /data
 magic_ids.json
 .idea/
