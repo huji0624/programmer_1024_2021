@@ -202,10 +202,10 @@ func Caltwo(num1 string,num2 string,op string) string{
 }
 
 func main() {
-	form := "(102**4+-))12(9912*12)1)"
-	log.Println(form)
-	log.Println(CalFormula(form))
-	return
+	//form := "(102**4+-))12(9912*12)1)"
+	//log.Println(form)
+	//log.Println(CalFormula(form))
+	//return
 
 	pid := os.Getpid()
 	ioutil.WriteFile("./pid",[]byte(fmt.Sprintf("%d",pid)),0644)
