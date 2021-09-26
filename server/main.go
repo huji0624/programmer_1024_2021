@@ -11,7 +11,6 @@ import (
 	"math/big"
 	"net/http"
 	"os"
-	"sort"
 	"sync"
 	"time"
 	"server/util"
@@ -63,28 +62,27 @@ func CalFormula(formula string) (string,[]string,string){
 		token = ""
 	}
 
-	//log.Println(tokens)
 	//tokens to nums
-	readable := ""
 	ids := make([]string,0,10)
-	replaceed := make([]string,0,10)
-	for _,v := range tokens{
-		if v!="+" && v!="-" && v!="*" && v!="/"{
-			magic,ok := magic_ids[v]
-			if ok{
-				readable += magic
-				replaceed = append(replaceed,magic)
-				ids = append(ids,v)
-			}else{
-				return "",nil,""
-			}
-		}else{
-			readable += v
-			replaceed = append(replaceed,v)
-		}
-	}
+	readable := ""
+	//replaceed := make([]string,0,10)
+	//for _,v := range tokens{
+	//	if v!="+" && v!="-" && v!="*" && v!="/"{
+	//		magic,ok := magic_ids[v]
+	//		if ok{
+	//			readable += magic
+	//			replaceed = append(replaceed,magic)
+	//			ids = append(ids,v)
+	//		}else{
+	//			return "",nil,""
+	//		}
+	//	}else{
+	//		readable += v
+	//		replaceed = append(replaceed,v)
+	//	}
+	//}
+	//sort.Strings(ids)
 
-	sort.Strings(ids)
 	return CalTokens(tokens),ids,readable
 }
 
@@ -97,6 +95,7 @@ func ReverseTokens(tokens []string) []string{
 }
 
 func CalTokens(tokens []string) string{
+	//log.Println(tokens)
 	if len(tokens)==1{
 		return tokens[0]
 	}
@@ -136,7 +135,7 @@ func CalTokens(tokens []string) string{
 			ops.Push(v)
 		}else if v==")"{
 			newTokens := make([]string,0,10)
-			for ops.Top()!="("{
+			for !ops.Empty() && ops.Top()!="(" {
 				newTokens = append(newTokens,nums.Pop())
 				newTokens = append(newTokens,ops.Pop())
 			}
@@ -176,6 +175,10 @@ func CalTokens(tokens []string) string{
 		}
 	}
 
+	if len(newTokens)==len(tokens){
+		return ""
+	}
+
 	return CalTokens(ReverseTokens(newTokens))
 }
 
@@ -199,6 +202,11 @@ func Caltwo(num1 string,num2 string,op string) string{
 }
 
 func main() {
+	form := "(102**4+-))12(9912*12)1)"
+	log.Println(form)
+	log.Println(CalFormula(form))
+	return
+
 	pid := os.Getpid()
 	ioutil.WriteFile("./pid",[]byte(fmt.Sprintf("%d",pid)),0644)
 
@@ -302,27 +310,27 @@ type FormulaData struct {
 }
 
 func Formula(c *gin.Context) {
-	if gameRoundOver{
-		ReturnError(c,errors.New("game round is over."))
-		return
-	}
+	//if gameRoundOver{
+	//	ReturnError(c,errors.New("game round is over."))
+	//	return
+	//}
 
 	var fd FormulaData
-	err := c.BindJSON(fd)
+	err := c.BindJSON(&fd)
 
 	if err != nil {
 		ReturnError(c,err)
 		return
 	}
 
-	if fd.Token==""{
-		ReturnError(c,errors.New("params token missing."))
-		return
-	}
-	if teams[fd.Token]==""{
-		ReturnError(c,errors.New("token not valide."))
-		return
-	}
+	//if fd.Token==""{
+	//	ReturnError(c,errors.New("params token missing."))
+	//	return
+	//}
+	//if teams[fd.Token]==""{
+	//	ReturnError(c,errors.New("token not valide."))
+	//	return
+	//}
 	if fd.Formula==""{
 		ReturnError(c,errors.New("params formula missing."))
 		return
@@ -333,6 +341,17 @@ func Formula(c *gin.Context) {
 
 	formula := fd.Formula
 	ret,ids,readable := CalFormula(formula)
+
+	//for test
+	if ret=="1024"{
+		ReturnData(c,0,nil)
+		return
+	}else{
+		ReturnData(c,1,nil)
+		return
+	}
+	//for test
+
 	if ret=="1024"{
 		idsbytes,jerr := json.Marshal(ids)
 		if jerr==nil{
