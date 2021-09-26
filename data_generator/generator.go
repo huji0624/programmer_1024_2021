@@ -20,7 +20,7 @@ const ConcurrentCount = 10
 const MagicRatio = 50000
 const OutputDir = "data"
 
-var magicids []string = make([]string, 0, 1000)
+var magicids map[string]string = make(map[string]string)
 var magicidsLock sync.Mutex
 
 func createEnv() {
@@ -209,7 +209,7 @@ func generateOneFile(c chan int, done chan int,randSourceSeed int64,timesource b
 		ifmagic, mg := generateMagicNumber(copyBig(numInID), generator)
 		if ifmagic {
 			magicidsLock.Lock()
-			magicids = append(magicids, id)
+			magicids[id] = mg
 			magicidsLock.Unlock()
 			magicCount++
 		} else {

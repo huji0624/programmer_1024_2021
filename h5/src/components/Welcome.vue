@@ -1,17 +1,22 @@
 <template>
   <el-container>
-    <el-aside width="200px">
+    <el-aside width="50px">
 
     </el-aside>
     <el-main style="">
     
 
-    <el-progress :text-inside="true" :stroke-width="24" :percentage="progress" status="success"></el-progress>
-    <p>被挖出宝藏占比</p>
+    <!-- <el-progress :text-inside="true" :stroke-width="24" :percentage="progress" status="success"></el-progress> -->
+    
+
+    <el-row :gutter="20">
+      <el-col :span="8" v-for="(item) in teamscore" v-bind:key="item.name">{{item.name}} : {{item.score}}</el-col>
+    </el-row>
 
     <el-table
+      max-height="450"
       :data="tableData"
-      style="width: 70%;margin:auto;margin-top:50px;"
+      style="width: 100%;margin:auto;margin-top:50px;"
       :header-cell-style="hcs"
       :cell-style="hcs">
       <el-table-column
@@ -22,10 +27,16 @@
         prop="score"
         label="得分">
       </el-table-column>
+      <el-table-column
+        prop="type"
+        label="得分项">
+      </el-table-column>
     </el-table>
       
     </el-main>
-    <el-aside width="200px">
+
+    <el-aside width="120px">
+        <h4>剩余时间 {{lefttime}} 秒</h4>
         <el-input size="mini" v-model="input" placeholder="密令"></el-input>
         <el-button size="mini" @click="reset" type="warning" style="margin-top:20px;">重置</el-button>
     </el-aside>
@@ -43,7 +54,9 @@ export default {
     return {
       tableData:[],
       progress:0,
-      input:""
+      input:"",
+      lefttime:180,
+      teamscore:[]
     }
   },
   created:function(){
@@ -72,25 +85,54 @@ export default {
     getList:function(){
       let out_this = this;
       common.get("info",{},function(res){
-        // console.log(res)
-        // out_this.$message.success("OK.")
-        let tbs = [];
-        let ret = res.data.data.result;
-        let tt = 0;
-        for (let key in ret) {
-          let v = ret[key]
-          tt += v
-          tbs.push({name:key,score:v})
-        }
-        tbs = tbs.sort(function(a,b){
-          return b["score"]-a["score"]
-        })
-        out_this.tableData = tbs;
+        // console.log(res.data.data)
 
-        if(res.data.data.total){
-          out_this.progress = Math.floor(tt/res.data.data.total*10000)/100
-          // console.log(out_this.progress)
+        let data = res.data.data;
+        out_this.lefttime = data.lefttime;
+
+        let teamscoremap = {};
+        let tbd = [];
+        for(let k in data.magics){
+          let v = data.magics[k]
+          let item = {};
+          item.name = v;
+          item.score = 1;
+          item.type = k;
+          tbd.push(item);
+
+          if(!teamscoremap[v]){
+            teamscoremap[v] = 0;
+          }
+
+          teamscoremap[v] += 1;
         }
+
+        for(let k in data.formulas){
+          let v = data.formulas[k]
+
+          let tname = v[0];
+
+          let item = {};
+          item.name = tname;
+          let idcount = JSON.parse(k).length;
+          item.score = idcount*idcount;
+          item.type = v[1];
+          tbd.push(item);
+
+          if(!teamscoremap[tname]){
+            teamscoremap[tname] = 0;
+          }
+
+          teamscoremap[tname] += item.score;
+        }
+
+        let tmp = [];
+        for(let k in teamscoremap){
+          tmp.push({name:k,score:teamscoremap[k]})
+        }
+        out_this.teamscore = tmp;
+        
+        out_this.tableData = tbd;
 
       },function(err){
         console.log(err)
