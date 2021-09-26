@@ -22,7 +22,11 @@
 
   例如 : {"locationid":"2mnab0kquw4uuu8nnm","magic":"2"} 抽取后的数字为2048，2048/1024 = 2 恰好等于magic代表的数字，所以这个地点就代表有宝藏.
 
-- 找到宝藏地点后，需要把对应的locationid通过post请求，发送到我们的服务器，如果该宝藏还未被其他队伍找到，那么获得1分.
+- 找到宝藏地点后，需要把对应的locationid通过post请求，发送到我们的dig接口，如果该宝藏还未被其他队伍找到，那么获得1分.
+
+- 对找到的所有magic，对其中n个数，若通过加减乘除（可以有"()"）等于1024，那么把对应的计算方法，生成算式，发送到我们的formula接口，如果对应的n个数字的算式还没有被其他队伍发现，获得n*n分，算式中的数字用locationid代表.
+
+  例如：(vbncooczywr3ybqiu8bo6uq5xcmq93ihd6b24dh5gacskeiubdwlzyzckocd0z5k+gp16z0epmyodmqc5hywuidodsfqhd816w7uze1xz2jlc00rddaf5267m5fxvdd0h)*(1249eabfioy2cdro0ggsaqsovfadqxdnykmys2lke5xa2a3zjzsxb8n0rqd2kyej-lzvlff6idy8e9w4oe14ufuz82inpvn64p1izh4jbzedpiurx9d8glqsp6b9i4phs)
 
 - 最后，得分最多的队伍获胜，如果有队伍得分一样，那么首先获得第1分的队伍获胜.
 
@@ -100,7 +104,28 @@
 }
 ```
 
+接口地址：http://47.104.220.230/formula
 
+请求方法：POST
+
+请求Header: application/json
+
+请求参数:
+
+```
+{
+	"formula":"(qwe+mas)*su5mq-wpqs*yyq21hs", //算式字符串
+	"token":"ooaksuquwqiw=928182ijasj" //请求token
+}
+```
+
+响应数据：
+
+```
+{
+	"errorno":0, // 0表示成功，其他返回值表示错误;
+}
+```
 
 # post请求示例
 

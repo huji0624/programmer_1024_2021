@@ -5,14 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/big"
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
-var magics []string
+var magicids = make(map[string]string)
+var magiclock sync.Mutex
 
 func main() {
 	//cpuNum := runtime.NumCPU()
@@ -35,6 +38,10 @@ func main() {
 		if count==len(flist){
 			break
 		}
+	}
+
+	for k,v := range magicids{
+		log.Printf("%v : %v",k,v)
 	}
 
 	println("whole duration:", time.Since(begin).String())
@@ -70,20 +77,25 @@ func workOnLine(line string) {
 
 	bi := stripInt(item.Locationid)
 	if checkIFMagic(bi, item.Magic) {
-		//println("Magic:",item.Locationid)
-		//magics = append(magics, item.Locationid)
+		//magiclock.Lock()
+		//magicids[item.Locationid] = item.Magic
+		//magiclock.Unlock()
 
-		//return
-		data := make(map[string]interface{})
-		data["locationid"] = item.Locationid
-		data["token"] = "test1"
-
-		bytesData, _ := json.Marshal(data)
-		resp, _ := http.Post("http://47.104.220.230/dig","application/json", bytes.NewReader(bytesData))
-		defer resp.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
-		fmt.Println(string(body))
+		go SendRequest(item.Locationid)
 	}
+}
+
+func SendRequest(locationid string){
+	//return
+	data := make(map[string]interface{})
+	data["locationid"] = locationid
+	data["token"] = "test1"
+
+	bytesData, _ := json.Marshal(data)
+	resp, _ := http.Post("http://47.104.220.230/dig","application/json", bytes.NewReader(bytesData))
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
 }
 
 func stripInt(id string) *big.Int {
