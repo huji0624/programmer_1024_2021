@@ -414,6 +414,7 @@ func Dig(c *gin.Context) {
 	if gameRoundOverTimer==nil{
 		gameRoundOverTimer = time.AfterFunc(time.Second*180, func() {
 			gameRoundOver = true
+			gameStartTime = -1
 		})
 		gameStartTime = time.Now().Second()
 	}
@@ -473,6 +474,8 @@ func Info(c *gin.Context) {
 
 	if gameStartTime!=-1{
 		data.Lefttime = 180 - (time.Now().Second() - gameStartTime)
+	}else{
+		data.Lefttime = 0
 	}
 	data.Magics = result
 	data.Formulas = magic_formula

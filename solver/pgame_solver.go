@@ -8,7 +8,6 @@ import (
 	"log"
 	"math/big"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -68,12 +67,9 @@ type Line struct {
 
 func workOnLine(line string) {
 	var item Line
-	err := json.Unmarshal([]byte(line), &item)
-	if err != nil {
-		println(line)
-		println(err.Error())
-		os.Exit(0)
-	}
+
+	item.Locationid = line[15:79]
+	item.Magic = line[90:len(line)-2]
 
 	bi := stripInt(item.Locationid)
 	if checkIFMagic(bi, item.Magic) {

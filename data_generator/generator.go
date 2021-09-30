@@ -24,6 +24,12 @@ var magicids map[string]string = make(map[string]string)
 var magicidsLock sync.Mutex
 
 func createEnv() {
+	err0 := os.RemoveAll(OutputDir)
+	if err0!=nil{
+		log.Println(err0)
+		os.Exit(-1)
+	}
+
 	_, err := os.Stat(OutputDir)
 	if os.IsNotExist(err) {
 		err = os.Mkdir(OutputDir, os.ModePerm)
@@ -36,7 +42,7 @@ func main() {
 	var randomSourceSeed int64
 	flag.Int64Var(&randomSourceSeed,"s",0,"random source seed.")
 	flag.IntVar(&TotalFileCount,"c",5,"total file count.")
-	flag.IntVar(&DataCountEachFile,"d",10,"data count each file.unit 10000.")
+	flag.IntVar(&DataCountEachFile,"d",100,"data count each file.unit 10000.")
 	flag.Parse()
 
 	DataCountEachFile = DataCountEachFile * 10000
