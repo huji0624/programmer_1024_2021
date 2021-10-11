@@ -11,6 +11,7 @@ import (
 	"math/big"
 	"net/http"
 	"os"
+	"sort"
 	"sync"
 	"time"
 	"server/util"
@@ -65,23 +66,27 @@ func CalFormula(formula string) (string,[]string,string){
 	//tokens to nums
 	ids := make([]string,0,10)
 	readable := ""
-	//replaceed := make([]string,0,10)
-	//for _,v := range tokens{
-	//	if v!="+" && v!="-" && v!="*" && v!="/"{
-	//		magic,ok := magic_ids[v]
-	//		if ok{
-	//			readable += magic
-	//			replaceed = append(replaceed,magic)
-	//			ids = append(ids,v)
-	//		}else{
-	//			return "",nil,""
-	//		}
-	//	}else{
-	//		readable += v
-	//		replaceed = append(replaceed,v)
-	//	}
-	//}
-	//sort.Strings(ids)
+	replaceed := make([]string,0,10)
+	for _,v := range tokens{
+		if v!="+" && v!="-" && v!="*" && v!="/" && v!="(" && v!=")"{
+			magic,ok := magic_ids[v]
+			if ok{
+				readable += magic
+				replaceed = append(replaceed,magic)
+				ids = append(ids,v)
+			}else{
+				return "",nil,""
+			}
+		}else{
+			readable += v
+			replaceed = append(replaceed,v)
+		}
+	}
+	sort.Strings(ids)
+
+	if len(ids) < 4 {
+		return "",nil,""
+	}
 
 	return CalTokens(tokens),ids,readable
 }
