@@ -12,7 +12,7 @@
 
 # 游戏规则
 
-- 组委会提供256个文件，每个数据文件包含100w条数据，每条数据用\n换行符分割
+- 组委会提供128个文件，每个数据文件包含200w条左右数据，每条数据用\n换行符分割
 
 - 每一条的数据格式为json，形如：
 
@@ -24,7 +24,7 @@
 
 - 找到宝藏地点后，需要把对应的locationid通过post请求，发送到我们的dig接口，如果该宝藏还未被其他队伍找到，那么获得1分.
 
-- 对找到的所有magic，对其中n个数，若通过加减乘除（可以有"()"）等于1024，那么把对应的计算方法，生成算式，发送到我们的formula接口，如果对应的n个数字的算式还没有被其他队伍发现，获得n*n分，算式中的数字用locationid代表.
+- 对找到的所有magic，对其中n个数(n>=4)，若通过加减乘除（可以有"()"）等于1024，那么把对应的计算方法，生成算式，发送到我们的formula接口，如果对应的n个数字的算式还没有被其他队伍发现，获得n*n分，算式中的数字用locationid代表.
 
   例如：(vbncooczywr3ybqiu8bo6uq5xcmq93ihd6b24dh5gacskeiubdwlzyzckocd0z5k+gp16z0epmyodmqc5hywuidodsfqhd816w7uze1xz2jlc00rddaf5267m5fxvdd0h)*(1249eabfioy2cdro0ggsaqsovfadqxdnykmys2lke5xa2a3zjzsxb8n0rqd2kyej-lzvlff6idy8e9w4oe14ufuz82inpvn64p1izh4jbzedpiurx9d8glqsp6b9i4phs)
 
@@ -35,6 +35,10 @@
 ​		   2 - magic的长度为2-32个字符表示的数字.
 
 ​		   3 - magic "027" 表示 27.
+
+​		   4 - 比赛当天抽两个组测试一下.
+
+​		   5 - 每场比赛时间3分钟.
 
 # 奖项设置
 

@@ -16,7 +16,7 @@ import (
 
 var TotalFileCount int
 var DataCountEachFile int
-const ConcurrentCount = 10
+const ConcurrentCount = 2
 const MagicRatio = 50000
 const OutputDir = "data"
 
