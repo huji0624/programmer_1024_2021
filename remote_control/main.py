@@ -25,7 +25,9 @@ def connect_all():
 
 if __name__ == '__main__':
     while True:
-        connect_all()
         cmd = input("请输入开始命令:\n")
+        #连接所有主机
+        connect_all()
+        #执行远程命令
         for session in sessions:
             session.exec_command(cmd)
