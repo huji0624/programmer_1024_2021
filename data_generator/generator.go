@@ -16,7 +16,8 @@ import (
 
 var TotalFileCount int
 var DataCountEachFile int
-const ConcurrentCount = 2
+
+const ConcurrentCount = 4
 const MagicRatio = 50000
 const OutputDir = "data"
 
@@ -25,7 +26,7 @@ var magicidsLock sync.Mutex
 
 func createEnv() {
 	err0 := os.RemoveAll(OutputDir)
-	if err0!=nil{
+	if err0 != nil {
 		log.Println(err0)
 		os.Exit(-1)
 	}
@@ -40,14 +41,14 @@ func createEnv() {
 }
 func main() {
 	var randomSourceSeed int64
-	flag.Int64Var(&randomSourceSeed,"s",0,"random source seed.")
-	flag.IntVar(&TotalFileCount,"c",5,"total file count.")
-	flag.IntVar(&DataCountEachFile,"d",100,"data count each file.unit 10000.")
+	flag.Int64Var(&randomSourceSeed, "s", 0, "random source seed.")
+	flag.IntVar(&TotalFileCount, "c", 5, "total file count.")
+	flag.IntVar(&DataCountEachFile, "d", 100, "data count each file.unit 10000.")
 	flag.Parse()
 
 	DataCountEachFile = DataCountEachFile * 10000
 
-	log.Println("Seed : ",randomSourceSeed)
+	log.Println("Seed : ", randomSourceSeed)
 
 	createEnv()
 
@@ -56,7 +57,7 @@ func main() {
 	done := make(chan int, TotalFileCount)
 	for i := 0; i < TotalFileCount; i++ {
 		ch <- i
-		go generateOneFile(ch, done,randomSourceSeed+int64(i),randomSourceSeed==0)
+		go generateOneFile(ch, done, randomSourceSeed+int64(i), randomSourceSeed == 0)
 	}
 
 	count := 0
@@ -197,13 +198,13 @@ func checkIFMagic(id *big.Int, mg string) bool {
 	return false
 }
 
-func generateOneFile(c chan int, done chan int,randSourceSeed int64,timesource bool) {
+func generateOneFile(c chan int, done chan int, randSourceSeed int64, timesource bool) {
 
 	magicCount := 0
 	var source rand.Source
-	if timesource{
+	if timesource {
 		source = rand.NewSource(time.Now().UnixNano())
-	}else{
+	} else {
 		source = rand.NewSource(randSourceSeed)
 	}
 	generator := rand.New(source)
