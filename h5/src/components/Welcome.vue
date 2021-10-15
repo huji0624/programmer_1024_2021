@@ -10,7 +10,7 @@
     
 
     <el-row :gutter="20">
-      <el-col :span="8" v-for="(item) in teamscore" v-bind:key="item.name">{{item.name}} : {{item.score}}</el-col>
+      <el-col style="border:solid 1px blue" :span="8" v-for="(item) in teamscore" v-bind:key="item.name">{{item.name}} : {{item.score}}</el-col>
     </el-row>
 
     <el-table
@@ -85,54 +85,31 @@ export default {
     getList:function(){
       let out_this = this;
       common.get("info",{},function(res){
-        // console.log(res.data.data)
+        console.log(res.data.data)
 
         let data = res.data.data;
         out_this.lefttime = data.lefttime;
 
-        let teamscoremap = {};
-        let tbd = [];
-        for(let k in data.magics){
-          let v = data.magics[k]
-          let item = {};
-          item.name = v;
-          item.score = 1;
-          item.type = k;
-          tbd.push(item);
-
-          if(!teamscoremap[v]){
-            teamscoremap[v] = 0;
+        let tmp = {}
+        let records = []
+        for(let k in data.records){
+          let v = data.records[k]
+          records.push({name:v.team,score:v.score,type:v.record})
+          
+          if(tmp[v.team]==undefined){
+            tmp[v.team] = {name:v.team,score:0}
           }
 
-          teamscoremap[v] += 1;
+          tmp[v.team].score += v.score
         }
-
-        for(let k in data.formulas){
-          let v = data.formulas[k]
-
-          let tname = v[0];
-
-          let item = {};
-          item.name = tname;
-          let idcount = JSON.parse(k).length;
-          item.score = idcount*idcount;
-          item.type = v[1];
-          tbd.push(item);
-
-          if(!teamscoremap[tname]){
-            teamscoremap[tname] = 0;
-          }
-
-          teamscoremap[tname] += item.score;
+        let teams = []
+        for (let k in  tmp){
+          teams.push(tmp[k])
         }
+        out_this.teamscore = teams;
 
-        let tmp = [];
-        for(let k in teamscoremap){
-          tmp.push({name:k,score:teamscoremap[k]})
-        }
-        out_this.teamscore = tmp;
-        
-        out_this.tableData = tbd;
+        records.reverse()
+        out_this.tableData = records
 
       },function(err){
         console.log(err)

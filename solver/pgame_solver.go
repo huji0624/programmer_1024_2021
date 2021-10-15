@@ -27,26 +27,26 @@ func main() {
 
 	for _, f := range flist {
 		fPath := dirPath + "/" + f.Name()
-		go workOnFile(fPath,ch)
+		go workOnFile(fPath, ch)
 	}
 
 	count := 0
 	for true {
 		<-ch
 		count++
-		if count==len(flist){
+		if count == len(flist) {
 			break
 		}
 	}
 
-	for k,v := range magicids{
-		log.Printf("%v : %v",k,v)
+	for k, v := range magicids {
+		log.Printf("%v : %v", k, v)
 	}
 
 	println("whole duration:", time.Since(begin).String())
 }
 
-func workOnFile(fPath string,ch chan string){
+func workOnFile(fPath string, ch chan string) {
 	fContent, _ := ioutil.ReadFile(fPath)
 
 	text := string(fContent)
@@ -69,7 +69,7 @@ func workOnLine(line string) {
 	var item Line
 
 	item.Locationid = line[15:79]
-	item.Magic = line[90:len(line)-2]
+	item.Magic = line[90 : len(line)-2]
 
 	bi := stripInt(item.Locationid)
 	if checkIFMagic(bi, item.Magic) {
@@ -81,14 +81,14 @@ func workOnLine(line string) {
 	}
 }
 
-func SendRequest(locationid string){
+func SendRequest(locationid string) {
 	//return
 	data := make(map[string]interface{})
 	data["locationid"] = locationid
-	data["token"] = "test1"
+	data["token"] = "afd23ae2c670f92ef24ece5849db1579"
 
 	bytesData, _ := json.Marshal(data)
-	resp, _ := http.Post("http://47.104.220.230/dig","application/json", bytes.NewReader(bytesData))
+	resp, _ := http.Post("http://47.104.220.230/dig", "application/json", bytes.NewReader(bytesData))
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
