@@ -39,6 +39,8 @@ type SRcord struct {
 var scores_record []*SRcord
 
 func CalFormula(formula string) (string, []string, string) {
+	// log.Println(formula)
+
 	tokens := make([]string, 0, 10)
 	token := ""
 	for _, c := range formula {
@@ -74,6 +76,8 @@ func CalFormula(formula string) (string, []string, string) {
 		token = ""
 	}
 
+	// log.Println(magic_ids)
+
 	//tokens to nums
 	ids := make([]string, 0, 10)
 	readable := ""
@@ -86,6 +90,7 @@ func CalFormula(formula string) (string, []string, string) {
 				replaceed = append(replaceed, magic)
 				ids = append(ids, v)
 			} else {
+				log.Println("not:",v)
 				return "", nil, ""
 			}
 		} else {
@@ -99,7 +104,7 @@ func CalFormula(formula string) (string, []string, string) {
 		return "", nil, ""
 	}
 
-	return CalTokens(tokens), ids, readable
+	return CalTokens(replaceed), ids, readable
 }
 
 func ReverseTokens(tokens []string) []string {
@@ -111,7 +116,7 @@ func ReverseTokens(tokens []string) []string {
 }
 
 func CalTokens(tokens []string) string {
-	//log.Println(tokens)
+	// log.Println(tokens)
 	if len(tokens) == 1 {
 		return tokens[0]
 	}
@@ -211,6 +216,10 @@ func Caltwo(num1 string, num2 string, op string) string {
 	case "*":
 		return bi1.Mul(bi1, bi2).String()
 	case "/":
+		if(bi2.String()=="0"){
+			log.Println("div zero.wrong")
+			return ""
+		}
 		return bi1.Div(bi1, bi2).String()
 	}
 
@@ -524,7 +533,7 @@ func Info(c *gin.Context) {
 	}
 	data.Magics = result
 	data.Formulas = magic_formula
-	data.Records = scores_record
+	data.Records = scores_record[len(scores_record)-100:]
 
 	ReturnData(c, 0, data)
 }
