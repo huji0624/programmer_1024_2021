@@ -22,7 +22,6 @@ import (
 
 var magic_ids map[string]string
 var magic_id_scores = make(map[string]string)
-var magic_formula = make(map[string][2]string)
 
 ///使用过的 magic_ids
 var used_magic_ids_set = make(map[string]bool)
@@ -326,8 +325,6 @@ func loadMagicIDS() {
 		magic_id_scores[k] = ""
 	}
 
-	magic_formula = make(map[string][2]string)
-
 	log.Println("loadMagicIDS:")
 	log.Println(len(magic_id_scores))
 
@@ -426,23 +423,10 @@ func Formula(c *gin.Context) {
 				used_magic_ids_set[id] = true
 			}
 
-			idsbytes, jerr := json.Marshal(ids)
-			if jerr == nil {
-				idskey := string(idsbytes)
-				_, ok := magic_formula[idskey]
-				if !ok {
-					var tmp [2]string
-					tmp[0] = teams[fd.Token]
-					tmp[1] = readable
-					magic_formula[idskey] = tmp
+			ReturnData(c, 0, nil)
 
-					ReturnData(c, 0, nil)
-				} else {
-					ReturnData(c, 2, nil)
-				}
-			} else {
-				ReturnData(c, 1, nil)
-			}
+			scores_record = append(scores_record, &SRcord{Team: teams[fd.Token], Score: len(ids) * len(ids), Record: readable})
+			return
 		} else if ret == "repeat" { //重复响应值
 			ReturnData(c, 3, ids)
 		} else {
@@ -527,6 +511,8 @@ func Dig(c *gin.Context) {
 				log.Printf("Team %v dig success.", dd.Token)
 				//success
 				ReturnData(c, 0, nil)
+
+				scores_record = append(scores_record, &SRcord{Team: teams[dd.Token], Score: 1, Record: dd.Locationid})
 			} else {
 				//fail.alreay digged by others.
 				ReturnData(c, 2, nil)
@@ -542,10 +528,8 @@ func Dig(c *gin.Context) {
 }
 
 type InfoData struct {
-	Formulas map[string][2]string `json:"formulas"`
-	Magics   map[string]string    `json:"magics"`
-	Lefttime int                  `json:"lefttime"`
-	Records  []*SRcord            `json:"records"`
+	Lefttime int       `json:"lefttime"`
+	Records  []*SRcord `json:"records"`
 }
 
 func Info(c *gin.Context) {
@@ -555,21 +539,17 @@ func Info(c *gin.Context) {
 
 	var data InfoData
 
-	var result = make(map[string]string)
-	for k, v := range magic_id_scores {
-		if v != "" {
-			result[k] = v
-		}
-	}
-
 	if gameStartTime != -1 {
 		data.Lefttime = 180 - (time.Now().Second() - gameStartTime)
 	} else {
 		data.Lefttime = 0
 	}
-	data.Magics = result
-	data.Formulas = magic_formula
-	data.Records = scores_record[len(scores_record)-100:]
+
+	if len(scores_record) > 100 {
+		data.Records = scores_record[len(scores_record)-100:]
+	} else {
+		data.Records = scores_record
+	}
 
 	ReturnData(c, 0, data)
 }
