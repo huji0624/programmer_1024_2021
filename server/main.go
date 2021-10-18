@@ -453,9 +453,9 @@ func Formula(c *gin.Context) {
 		//for test
 		if ret == "1024" {
 			///成功则计算,已经使用的 magic 对应的 locationId  测试服务暂不处理
-			for _, id := range ids {
-				used_magic_ids_set[id] = true
-			}
+			//for _, id := range ids {
+			//	used_magic_ids_set[id] = true
+			//}
 			ReturnData(c, 0, nil)
 			scores_record = append(scores_record, &SRcord{Team: teams[fd.Token], Score: len(ids) * len(ids), Record: readable})
 			return
