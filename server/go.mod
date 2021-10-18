@@ -8,4 +8,3 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	gopkg.in/ini.v1 v1.62.0
 )
-

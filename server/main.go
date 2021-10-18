@@ -23,6 +23,10 @@ import (
 var magic_ids map[string]string
 var magic_id_scores = make(map[string]string)
 var magic_formula = make(map[string][2]string)
+
+///使用过的 magic_ids
+var used_magic_ids_set = make(map[string]bool)
+
 var teams = make(map[string]string)
 var diglock sync.Mutex
 
@@ -82,15 +86,26 @@ func CalFormula(formula string) (string, []string, string) {
 	ids := make([]string, 0, 10)
 	readable := ""
 	replaceed := make([]string, 0, 10)
+	cur_used_ids := make([]string, 0, 10)
 	for _, v := range tokens {
 		if v != "+" && v != "-" && v != "*" && v != "/" && v != "(" && v != ")" {
+			///检查 LocationId 是否使用过,	已经有元素被使用过则只记录被占用元素
+			_, ok := used_magic_ids_set[v]
+			if ok {
+				cur_used_ids = append(cur_used_ids, v)
+			}
+			if len(cur_used_ids) > 0 {
+				continue
+			}
+
+			///原有逻辑
 			magic, ok := magic_ids[v]
 			if ok {
 				readable += magic
 				replaceed = append(replaceed, magic)
 				ids = append(ids, v)
 			} else {
-				log.Println("not:",v)
+				log.Println("not:", v)
 				return "", nil, ""
 			}
 		} else {
@@ -98,6 +113,12 @@ func CalFormula(formula string) (string, []string, string) {
 			replaceed = append(replaceed, v)
 		}
 	}
+
+	///检查如果有元素被占用则直接返回
+	if len(cur_used_ids) > 0 {
+		return "repeat", cur_used_ids, ""
+	}
+
 	sort.Strings(ids)
 
 	if len(ids) < 4 {
@@ -216,7 +237,7 @@ func Caltwo(num1 string, num2 string, op string) string {
 	case "*":
 		return bi1.Mul(bi1, bi2).String()
 	case "/":
-		if(bi2.String()=="0"){
+		if bi2.String() == "0" {
 			log.Println("div zero.wrong")
 			return ""
 		}
@@ -352,6 +373,8 @@ func Reset(c *gin.Context) {
 
 	loadMagicIDS()
 	scores_record = make([]*SRcord, 0, 0)
+	//重置used_magic_ids_set
+	used_magic_ids_set = make(map[string]bool)
 
 	ReturnData(c, 0, nil)
 }
@@ -398,6 +421,11 @@ func Formula(c *gin.Context) {
 
 	if gin.Mode() == gin.ReleaseMode {
 		if ret == "1024" {
+			///成功则计算,已经使用的 magic 对应的 locationId
+			for _, id := range ids {
+				used_magic_ids_set[id] = true
+			}
+
 			idsbytes, jerr := json.Marshal(ids)
 			if jerr == nil {
 				idskey := string(idsbytes)
@@ -415,6 +443,8 @@ func Formula(c *gin.Context) {
 			} else {
 				ReturnData(c, 1, nil)
 			}
+		} else if ret == "repeat" { //重复响应值
+			ReturnData(c, 3, ids)
 		} else {
 			//formula wrong or id wrong
 			ReturnData(c, 1, nil)
@@ -422,9 +452,15 @@ func Formula(c *gin.Context) {
 	} else {
 		//for test
 		if ret == "1024" {
+			///成功则计算,已经使用的 magic 对应的 locationId  测试服务暂不处理
+			for _, id := range ids {
+				used_magic_ids_set[id] = true
+			}
 			ReturnData(c, 0, nil)
 			scores_record = append(scores_record, &SRcord{Team: teams[fd.Token], Score: len(ids) * len(ids), Record: readable})
 			return
+		} else if ret == "repeat" { //重复响应值
+			ReturnData(c, 3, ids)
 		} else {
 			ReturnData(c, 1, nil)
 			return
