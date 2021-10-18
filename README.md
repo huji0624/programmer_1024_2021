@@ -24,9 +24,15 @@
 
 - 找到宝藏地点后，需要把对应的locationid通过post请求，发送到我们的dig接口，如果该宝藏还未被其他队伍找到，那么获得1分.
 
-- 对找到的所有magic，对其中n个数(n>=4)，若通过加减乘除（可以有"()"，整数除法）等于1024，那么把对应的计算方法，生成算式，发送到我们的formula接口，如果对应的n个数字的算式还没有被其他队伍发现，获得n*n分，算式中的数字用locationid代表.
+- 对找到的所有magic，对其中n个数(n>=4)，若通过加减乘除（可以有"()"，整数除法）等于1024，那么把对应的计算方法，生成算式，发送到我们的formula接口，如果对应的n个数字还没有被其他组在其他成功的算式中使用过，获得n*n分，算式中的数字用locationid代表.
 
   例如：(vbncooczywr3ybqiu8bo6uq5xcmq93ihd6b24dh5gacskeiubdwlzyzckocd0z5k+gp16z0epmyodmqc5hywuidodsfqhd816w7uze1xz2jlc00rddaf5267m5fxvdd0h)*(1249eabfioy2cdro0ggsaqsovfadqxdnykmys2lke5xa2a3zjzsxb8n0rqd2kyej-lzvlff6idy8e9w4oe14ufuz82inpvn64p1izh4jbzedpiurx9d8glqsp6b9i4phs)
+
+  例子2:
+
+  如果队伍x的算式 A + B + C + D =1024 ，已经被一个组找到平提交formula到服务器成功。那么队伍y的算式 A + B + E+F = 1024  会返回错误。A + B + C*D =1024 也会返回错误。
+
+  
 
 - 最后，得分最多的队伍获胜，如果有队伍得分一样，那么首先获得第1分的队伍获胜.
 
@@ -127,7 +133,8 @@
 
 ```
 {
-	"errorno":0, // 0表示成功，其他返回值表示错误;
+	"errorno":0, // 0表示成功，3表示算式有被使用了的locationid，其他返回值表示错误;
+	"data":["locationid1","locationid2"] // 当errorno=3时返回这个字段，表示算式中所有已经被使用的locationid
 }
 ```
 
