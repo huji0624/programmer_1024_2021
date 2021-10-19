@@ -8,10 +8,10 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.huldra.math.BigInt;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.math.BigInteger;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static site.javen.solver.Utils.*;
 
 public class Main implements ByteDecoderHandler {
-    private static final File DATA_DIR = new File("/Users/coder/go/src/programmer_1024_2021/data_generator/data");
+    private static final File DATA_DIR = new File("./data");
 
     public static void main(String[] args) throws Exception {
         Utils.log("[io threads]:%d   [network threads]:%d", (maxThreadsCount - netThreads), netThreads);
@@ -88,11 +88,11 @@ public class Main implements ByteDecoderHandler {
 
 
     @Override
-    public void onFoundItem(byte[] locationId, BigInteger locationValue, BigInteger magic) {
+    public void onFoundItem(byte[] locationId, BigInt locationValue, BigInt magic) {
         if (isMatchMagic(locationValue, magic)) {
             String loc = new String(locationId);
             matchCount.incrementAndGet();
-            postResultToServer(loc);
+//            postResultToServer(loc);
         }
     }
 

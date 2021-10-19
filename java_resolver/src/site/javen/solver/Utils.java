@@ -1,14 +1,11 @@
 package site.javen.solver;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.List;
+import org.huldra.math.BigInt;
 
 public class Utils {
-    static final BigInteger B1024 = BigInteger.valueOf(1024);
+    static final BigInt B1024 = new BigInt(1024);
+    static final BigInt BZERO = new BigInt(0);
 
     interface IgnoreExceptionRunnable {
         void run() throws Exception;
@@ -43,18 +40,18 @@ public class Utils {
      * @param magicId
      * @return
      */
-    public static boolean isMatchMagic(BigInteger locationId, BigInteger magicId) {
+    public static boolean isMatchMagic(BigInt locationId, BigInt magicId) {
         int cmpValue = locationId.compareTo(magicId);
         if (cmpValue < 0) {//locationId<magic
-            if (locationId.add(B1024).compareTo(magicId) == 0) {
+            if (locationId.copy().add(B1024).equals(magicId)) {
                 return true;
             }
-            return locationId.multiply(B1024).compareTo(magicId) == 0;
+            return locationId.copy().mul(B1024).equals(magicId);
         } else if (cmpValue > 0) {
-            if (locationId.subtract(B1024).compareTo(magicId) == 0) {
+            if (locationId.copy().sub(B1024).equals(magicId)) {
                 return true;
             }
-            return magicId.compareTo(B1024) < 0 && locationId.mod(B1024).compareTo(magicId) == 0;
+            return magicId.compareTo(B1024) < 0 && locationId.copy().mod(B1024).equals(magicId);
         }
         return false;
     }

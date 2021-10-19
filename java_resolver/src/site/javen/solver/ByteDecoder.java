@@ -1,6 +1,7 @@
 package site.javen.solver;
 
-import java.math.BigInteger;
+import org.huldra.math.BigInt;
+
 import java.util.Arrays;
 
 public class ByteDecoder {
@@ -14,8 +15,8 @@ public class ByteDecoder {
     private byte mToken = TOKEN_BEGIN;
 
     byte[] locationStrBuffer = new byte[200];
-    byte[] locationValueBuffer = new byte[200];
-    byte[] magicValueBuffer = new byte[200];
+    char[] locationValueBuffer = new char[200];
+    char[] magicValueBuffer = new char[200];
     int locationStrBufferLen = 0;
     int locationValueLen = 0;
     int magicValueBufferLen = -1;
@@ -50,7 +51,7 @@ public class ByteDecoder {
                 }
             }
             if (b >= '0' && b <= '9') {
-                locationValueBuffer[locationValueLen++] = b;
+                locationValueBuffer[locationValueLen++] = (char) b;
             }
             locationStrBuffer[locationStrBufferLen++] = b;
             return 1;
@@ -63,7 +64,7 @@ public class ByteDecoder {
                 } else {
                     mToken = TOKEN_BEGIN;
                     if (handler != null) {
-                        handler.onFoundItem(Arrays.copyOf(locationStrBuffer, locationStrBufferLen), locationValueLen < 1 ? BigInteger.ZERO : new BigInteger(new String(locationValueBuffer, 0, locationValueLen)), magicValueBufferLen < 1 ? BigInteger.ZERO : new BigInteger(new String(magicValueBuffer, 0, magicValueBufferLen)));
+                        handler.onFoundItem(Arrays.copyOf(locationStrBuffer, locationStrBufferLen), new BigInt(locationValueBuffer, locationValueLen), new BigInt(magicValueBuffer, magicValueBufferLen));
                     }
                     magicValueBufferLen = -1;
                     locationStrBufferLen = -1;
@@ -71,7 +72,7 @@ public class ByteDecoder {
                     return 3;
                 }
             }
-            magicValueBuffer[magicValueBufferLen++] = b;
+            magicValueBuffer[magicValueBufferLen++] = (char) b;
             return 1;
         }
         if (mToken == TOKEN_BEGIN) {

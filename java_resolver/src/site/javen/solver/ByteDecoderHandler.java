@@ -1,7 +1,9 @@
 package site.javen.solver;
 
-import java.math.BigInteger;
+import org.huldra.math.BigInt;
+
+
 
 public interface ByteDecoderHandler {
-    void onFoundItem(byte[] locationId, BigInteger locationValue, BigInteger magic);
+    void onFoundItem(byte[] locationId, BigInt locationValue, BigInt magic);
 }
