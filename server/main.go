@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/big"
+	"math/rand"
 	"net/http"
 	"os"
 	"server/util"
@@ -440,9 +441,18 @@ func Formula(c *gin.Context) {
 			//for _, id := range ids {
 			//	used_magic_ids_set[id] = true
 			//}
-			ReturnData(c, 0, nil)
-			scores_record = append(scores_record, &SRcord{Team: teams[fd.Token], Score: len(ids) * len(ids), Record: readable})
-			return
+			r := rand.Intn(100)
+			if r < 2 {
+				ReturnData(c, 3, ids)
+				return
+			} else if r < 3 {
+				ReturnData(c, 1, nil)
+				return
+			} else {
+				ReturnData(c, 0, nil)
+				scores_record = append(scores_record, &SRcord{Team: teams[fd.Token], Score: len(ids) * len(ids), Record: readable})
+				return
+			}
 		} else if ret == "repeat" { //重复响应值
 			ReturnData(c, 3, ids)
 		} else {
@@ -518,11 +528,20 @@ func Dig(c *gin.Context) {
 				ReturnData(c, 2, nil)
 			}
 		} else {
-			log.Printf("Team %v dig success.", dd.Token)
-			//success
-			ReturnData(c, 0, nil)
-
-			scores_record = append(scores_record, &SRcord{Team: teams[dd.Token], Score: 1, Record: dd.Locationid})
+			r := rand.Intn(100)
+			if r < 2 {
+				ReturnData(c, 2, nil)
+				return
+			} else if r < 3 {
+				ReturnData(c, 1, nil)
+				return
+			} else {
+				log.Printf("Team %v dig success.", dd.Token)
+				//success
+				ReturnData(c, 0, nil)
+				scores_record = append(scores_record, &SRcord{Team: teams[dd.Token], Score: 1, Record: dd.Locationid})
+				return
+			}
 		}
 	}
 }
@@ -545,10 +564,14 @@ func Info(c *gin.Context) {
 		data.Lefttime = 0
 	}
 
-	if len(scores_record) > 100 {
-		data.Records = scores_record[len(scores_record)-100:]
-	} else {
+	if gin.Mode() == gin.ReleaseMode {
 		data.Records = scores_record
+	} else {
+		if len(scores_record) > 10000 {
+			data.Records = scores_record[len(scores_record)-10000:]
+		} else {
+			data.Records = scores_record
+		}
 	}
 
 	ReturnData(c, 0, data)
