@@ -561,8 +561,8 @@ func Info(c *gin.Context) {
 	if gin.Mode() == gin.ReleaseMode {
 		data.Records = scores_record
 	} else {
-		if len(scores_record) > 10000 {
-			data.Records = scores_record[len(scores_record)-10000:]
+		if len(scores_record) > 100 {
+			data.Records = scores_record[len(scores_record)-100:]
 		} else {
 			data.Records = scores_record
 		}
