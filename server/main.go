@@ -540,9 +540,15 @@ func Dig(c *gin.Context) {
 	}
 }
 
+type Team struct {
+	Name  string `json:"name"`
+	Score int    `json:"score"`
+}
+
 type InfoData struct {
 	Lefttime int       `json:"lefttime"`
 	Records  []*SRcord `json:"records"`
+	Teams    []*Team   `json:"teams"`
 }
 
 func Info(c *gin.Context) {
@@ -567,6 +573,23 @@ func Info(c *gin.Context) {
 			data.Records = scores_record
 		}
 	}
+
+	score_map := make(map[string]int)
+	for _, v := range scores_record {
+		t, ok := score_map[v.Team]
+		if !ok {
+			t = 0
+		}
+		s := t + v.Score
+		score_map[v.Team] = s
+	}
+
+	teams := make([]*Team, 0, 0)
+	for k, v := range score_map {
+		teams = append(teams, &Team{Name: k, Score: v})
+	}
+
+	data.Teams = teams
 
 	ReturnData(c, 0, data)
 }
