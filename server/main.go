@@ -445,9 +445,6 @@ func Formula(c *gin.Context) {
 			if r < 2 {
 				ReturnData(c, 3, ids)
 				return
-			} else if r < 3 {
-				ReturnData(c, 1, nil)
-				return
 			} else {
 				ReturnData(c, 0, nil)
 				scores_record = append(scores_record, &SRcord{Team: teams[fd.Token], Score: len(ids) * len(ids), Record: readable})
@@ -531,9 +528,6 @@ func Dig(c *gin.Context) {
 			r := rand.Intn(100)
 			if r < 2 {
 				ReturnData(c, 2, nil)
-				return
-			} else if r < 3 {
-				ReturnData(c, 1, nil)
 				return
 			} else {
 				log.Printf("Team %v dig success.", dd.Token)
