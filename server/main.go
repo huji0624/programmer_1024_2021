@@ -257,8 +257,8 @@ func main() {
 
 	scores_record = make([]*SRcord, 0, 0)
 
-	gin.SetMode(gin.DebugMode)
-	// gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default() //返回默认引擎，里面有系统定义的中间件
 
 	//跨域问题
@@ -311,7 +311,7 @@ func md5V3(str string) string {
 }
 
 func loadMagicIDS() {
-	data, err := ioutil.ReadFile("../data_generator/magic_ids.json")
+	data, err := ioutil.ReadFile("../match_control/magic_ids.json")
 	if err != nil {
 		log.Println(err.Error())
 		os.Exit(-1)
@@ -364,7 +364,7 @@ func Reset(c *gin.Context) {
 	c.ShouldBindQuery(&params)
 	log.Println(params)
 
-	if params.Code != "pg" {
+	if params.Code != "hiKLD.624" {
 		ReturnError(c, errors.New("server error."))
 		return
 	}

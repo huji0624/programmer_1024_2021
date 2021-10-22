@@ -57,7 +57,7 @@ func main() {
 	done := make(chan int, TotalFileCount)
 	for i := 0; i < TotalFileCount; i++ {
 		ch <- i
-		go generateOneFile(ch, done, randomSourceSeed+int64(i), randomSourceSeed == 0)
+		go generateOneFile(ch, i, done, randomSourceSeed+int64(i), randomSourceSeed == 0)
 	}
 
 	count := 0
@@ -79,6 +79,7 @@ func main() {
 	println("")
 	println("Total magics : ", len(magicids))
 	ioutil.WriteFile("magic_ids.json", []byte(bs), 0644)
+	ioutil.WriteFile("seed", []byte(fmt.Sprintf("%d", randomSourceSeed)), 0644)
 
 	println("whole duration:", time.Since(begin).String())
 }
@@ -198,7 +199,7 @@ func checkIFMagic(id *big.Int, mg string) bool {
 	return false
 }
 
-func generateOneFile(c chan int, done chan int, randSourceSeed int64, timesource bool) {
+func generateOneFile(c chan int, index int, done chan int, randSourceSeed int64, timesource bool) {
 
 	magicCount := 0
 	var source rand.Source
@@ -234,7 +235,7 @@ func generateOneFile(c chan int, done chan int, randSourceSeed int64, timesource
 	//println(time.Now().String()," write data...")
 
 	num := <-c
-	filename := fmt.Sprintf("%s/Treasure_%d.data", OutputDir, num)
+	filename := fmt.Sprintf("%s/Treasure_%d.data", OutputDir, index)
 	ioutil.WriteFile(filename, []byte(b.String()), 0644)
 
 	println(time.Now().String(), " done.", filename, " magicCount:", magicCount)

@@ -1,11 +1,11 @@
 <template>
   <el-container>
-    <el-aside width="120px">
+    <el-aside width="320px">
     </el-aside>
     <el-main style="">
     
-    <el-row style="margin-top:10px;text-align:center;" v-for="(item) in teamscore" v-bind:key="item.name">
-      <el-button type="warning">{{item.name}} : {{item.score}}</el-button>
+    <el-row style="margin-top:10px;text-align:center;" v-for="(item,index) in teamscore" v-bind:key="item.name">
+      <el-button style="width:512px;" :type="typeFromIndex(index)">{{item.name}} : {{item.score}}</el-button>
     </el-row>
 
     <el-table
@@ -30,8 +30,12 @@
       
     </el-main>
 
-    <el-aside width="120px">
-        <h4>剩余时间 {{lefttime}} 秒</h4>
+    <el-aside width="320px">
+        <p>剩余时间</p>
+        <el-progress :percentage="timeleft" :format="format"></el-progress>
+        <p> </p>
+        <p> </p>
+        <p> </p>
         <el-input size="mini" v-model="input" placeholder="密令"></el-input>
         <el-button size="mini" @click="reset" type="warning" style="margin-top:20px;">重置</el-button>
     </el-aside>
@@ -50,6 +54,7 @@ export default {
       tableData:[],
       progress:0,
       input:"",
+      timeleft:100,
       lefttime:180,
       teamscore:[]
     }
@@ -62,6 +67,18 @@ export default {
     }, 1000);
   },
   methods:{
+    typeFromIndex(index){
+      if (index==0){
+        return "warning"
+      }else if(index==1){
+        return "success"
+      }
+
+      return "danger"
+    },
+    format() {
+        return `${this.lefttime}`;
+    },
     hcs:function(){
       return "text-align : center;"
     },
@@ -83,6 +100,7 @@ export default {
         console.log(res.data.data)
 
         let data = res.data.data;
+        out_this.timeleft = data.lefttime/180;
         out_this.lefttime = data.lefttime;
 
         let records = []
