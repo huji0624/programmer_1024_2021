@@ -1,6 +1,18 @@
 # programmer_1024_2021
 # 2021年可兰达程序员节：数据挖宝
 
+第一名：竹马大宝藏
+
+参赛源码见：solver/DigSakura
+
+第二名：黄鑫
+
+参赛源码见：solver/Wnl20211024
+
+第三名：Riftbreaker
+
+参赛源码见：https://github.com/pengyj1984/dig1024    main 分支
+
 # 活动流程
 
 1. 2021年10月8日：宣讲会。
